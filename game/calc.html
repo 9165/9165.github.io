@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>简算</title>
+<style type="text/css">
+	* {
+		transition: all 0.2s;
+	}
+	body {
+		font-family:Segoe UI Light,Segoe UI,等线 Light,等线,微软雅黑 Light,微软雅黑,STHeitiTC-Light;
+		overflow: hidden;
+	}
+
+	#bg {
+	  background: -webkit-linear-gradient(rgb(193,227,255), rgb(157,200,235));
+	  background: -o-linear-gradient(rgb(193,227,255), rgb(157,200,235));
+	  background: linear-gradient(rgb(193,227,255), rgb(157,200,235));
+	  position: absolute; left: 0; top: 0;
+	  width: 100%; height: 100%;
+	  z-index: -1;
+	}
+	#recordContent span {font-size: 30px;}
+
+	.color1 {color: rgb(123,157,185);} /*最深*/
+	.bgcolor1 {background-color: rgb(123,157,185);}
+	.color2,#recordContent span {color:rgb(193,227,255);} /*最浅*/
+	.bgcolor2 {background-color: rgb(193,227,255);}
+	.modeInput {
+		color:rgb(193,227,255);
+		background-color: transparent;
+		border-top: 0;
+		border-left: 0;
+		border-right: 0;
+		border-bottom: rgb(193,227,255) solid 1px;
+		font-size: 20px;
+		width: 30px;
+		text-align: center;
+	}
+</style>
+
+<script type="text/javascript">
+	var numArr=new Array();
+	var question;
+	var questionNum=1;
+	var answer=0;
+	var nowMode=3;
+	var nowPlace=2;
+	var nowNumNum=2;
+	var time=0;
+	var setTime;
+	window.onload=function() {
+		setQuestion(nowMode,nowPlace,nowNumNum);
+		document.getElementById('answerBoard').select();
+		setTime=setInterval('timeSet()',1000);
+	}
+	
+	function setQuestion(mode,place,numnum) {
+		for(a=0;a<numnum;a++) {
+			var oriNum;
+			do {
+				oriNum=Math.floor(Math.random()*(10**place));
+			}
+			while (oriNum.toString().length!=place);
+			numArr.push(oriNum);
+		}
+		if(mode==1) {
+			question=numArr.join("＋");
+			answer=numArr[0];
+			for(b=1;b<=numArr.length-1;b++) {
+				answer+=numArr[b];
+			}
+		}
+		else if(mode==2) {
+			question=numArr.join("－");
+			answer=numArr[0];
+			for(b=1;b<=numArr.length-1;b++) {
+				answer-=numArr[b];
+			}
+		}
+		else if(mode==3) {
+			question=numArr.join("×");
+			answer=numArr[0];
+			for(b=1;b<=numArr.length-1;b++) {
+				answer=answer*numArr[b];
+			}
+		}
+		document.getElementById('questionBoard').innerHTML=question;
+	}
+
+	function check() {
+		var yourans=parseInt(document.getElementById('answerBoard').value);
+		if(isNaN(yourans)==true) {
+			alert('请键入半角数字');
+			document.getElementById('answerBoard').value='';
+		}
+		else {
+			if(yourans.toString().length==answer.toString().length) {
+				if(yourans==answer) {
+					document.getElementById('recordContent').innerHTML="<span>"+questionNum+'.&nbsp;&nbsp;&nbsp;'+question+"＝"+yourans+"&nbsp;√"+"</span><br/>"+document.getElementById('recordContent').innerHTML;
+					numArr=new Array();
+					setQuestion(nowMode,nowPlace,nowNumNum);
+					document.getElementById('answerBoard').value='';
+					questionNum++;
+				}
+				else {
+					document.getElementById('recordContent').innerHTML="<span>"+questionNum+'.&nbsp;&nbsp;&nbsp;'+question+"＝"+yourans+"&nbsp;×"+"</span><br/>"+document.getElementById('recordContent').innerHTML;
+					document.getElementById('answerBoard').value='';
+				}
+			}
+			else{}			
+		}
+	}
+
+	function pause() {
+		document.getElementById('pauseBtn').innerHTML='▶';
+		document.getElementById('pauseFrame').style.left='0';
+		document.getElementById('pauseBtn').setAttribute("onclick",'contin()');
+		clearInterval(setTime);
+		document.getElementById('timePrint').innerHTML=time;
+		if(questionNum==1) {
+			document.getElementById('speedPrint').innerHTML='你还没做一题呢';
+		}
+		else {
+			document.getElementById('speedPrint').innerHTML=time/(questionNum-1);
+		}
+	}
+
+	function contin() {
+		document.getElementById('pauseBtn').innerHTML='| |';
+		document.getElementById('pauseFrame').style.left='-70%';
+		document.getElementById('pauseBtn').setAttribute("onclick","pause()");
+		setTime=setInterval('timeSet()',1000);
+	}
+
+	function modeSet() {
+		nowMode=parseInt(document.getElementById('nowModeFrame').value);
+		nowPlace=parseInt(document.getElementById('nowPlaceFrame').value);
+		nowNumNum=parseInt(document.getElementById('nowNumNumFrame').value);
+		numArr=new Array();
+		setQuestion(nowMode,nowPlace,nowNumNum);
+		document.getElementById('answerBoard').value='';
+	}
+
+	function timeSet() {
+		time++;
+	}
+</script>
+
+</head>
+<body>
+<div id="bg"></div>
+
+<div id="questionFrame" style="text-align: center; position: absolute; left: 0; top:0; width: 70%; height: 40%;">
+	<p class="color1" id="questionBoard" style="font-size: 100px; margin-top: 20%;"></p>
+</div>
+
+<div id="AnswerFrame1" style="position: absolute; left: 0; top:50%; width: 20%; height:50%; text-align: right;">
+	<span class="color1" style="font-size: 110px; line-height: 80px;">[</span>
+</div>
+
+<div id="AnswerFrame2" style="position: absolute; left: 20%; top:50%; width: 30%; height: 50%;">
+	<input type="text" id="answerBoard" class="color1" style="width:100%; height: 100px; font-size: 80px; text-align: center; font-family:Segoe UI Light,Segoe UI,微软雅黑 Light,微软雅黑,STHeitiTC-Light; background-color: transparent; border-color: transparent;" onkeyup="if(document.getElementById('answerBoard').value!=''){check()}else{}"/>
+</div>
+
+<div id="AnswerFrame3" style="position: absolute; left: 50%; top:50%; width: 20%; height: 50%;">
+	<span class="color1" style="font-size: 110px; line-height: 80px;">]</span>
+</div>
+		
+	
+<div id="recordFrame" class="bgcolor1" style="position: absolute; left: 70%; top:0; width: 30%; height: 100%; opacity: 0.8; padding-top: 2%; padding-left: 2%; overflow: auto;">
+	<span class="color2" style="font-size: 25px;">模式</span>
+	<span class="color2" style="font-size: 25px; cursor: pointer;" onclick="alert('第一个空是模式，1为加法，2为减法，3为乘法，默认为1加法\n第二个空是几位数，默认为2二位数\n第三个空是几个数字相加/减/乘，默认为2两个数字')">&nbsp;[?]&nbsp;&nbsp;&nbsp;&nbsp;</span>
+	<input class="modeInput" type="text" id="nowModeFrame" value="3"/>&nbsp;
+	<input class="modeInput" type="text" id="nowPlaceFrame" value="2"/>&nbsp;
+	<input class="modeInput" type="text" id="nowNumNumFrame" value="2"/>&nbsp;&nbsp;&nbsp;
+	<span class="bgcolor2 color1" style="cursor: pointer; font-size: 35px;" onclick="modeSet()">&nbsp;√&nbsp;</span>
+	<div style="width: 48%; height: 30px; position: relative; left: 0; top: 0;"><span class="color2" style="font-size: 50px;">记录</span></div>
+	<div style="width: 48%; height: 30px; position: relative; left: 40%; top: -30px; text-align: right;"><span id="pauseBtn" class="color2" style="font-size: 40px; cursor: pointer;" onclick="pause()">| |</span></div>
+	<div id="recordContent" style="padding-top: 10px;">
+	</div>
+</div>
+
+<div id="pauseFrame" class="bgcolor1" style="position: absolute; width: 70%; height: 100%; left: -70%; top:0;">
+	<table style="width: 100%; height: 100%"><tr><td style="padding-left:10%; padding-right: 2%;">
+		<span style="font-size: 50px;" class="color2">计算软件<s>阉割</s>简约版</span>
+		<br/><span style="font-size: 30px;" class="color2">by @Oranable 2019/6/21</span>
+		<br/><br/>
+		<span style="font-size: 20px;" class="color2">想到了很多事……</span>
+		<br/><br/>
+		<span style="font-size: 30px;" class="color2">用时(秒):</span>
+		<span id="timePrint" style="font-size: 30px;" class="color2"></span><br/>
+		<span style="font-size: 30px;" class="color2">速度(秒/题):</span>
+		<span id="speedPrint" style="font-size: 30px;" class="color2"></span>
+	</td></tr></table>
+</div>
+
+</body>
+</html>
